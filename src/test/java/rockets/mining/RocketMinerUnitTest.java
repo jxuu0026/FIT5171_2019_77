@@ -94,19 +94,7 @@ public class RocketMinerUnitTest {
 
     }
 
-
-    @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3})
-    public void shouldReturnTopMostRecentLaunches(int k ) {
-        when(dao.loadAll(Launch.class)).thenReturn(launches);
-        List<Launch> sortedLaunches = new ArrayList<>(launches);
-        sortedLaunches.sort((a, b) -> -a.getLaunchDate().compareTo(b.getLaunchDate()));
-        List<Launch> loadedLaunches = miner.mostRecentLaunches(k);
-        assertEquals(k, loadedLaunches.size());
-        assertEquals(sortedLaunches.subList(0, k), loadedLaunches);
-    }
-
-
+    
     @Test
     public void testMostExpensiveLaunches() {
 

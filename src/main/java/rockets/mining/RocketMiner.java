@@ -146,9 +146,9 @@ public class RocketMiner {
 
         }
 
-        Pi = Si / i;
-        Pj = Sj / j;
-        Pe = Se / e;
+        Pi = (double) Si / i;
+        Pj = (double) Sj / j;
+        Pe = (double) Se / e;
 
         Double DPi = new Double(Pi);
         Double DPj = new Double(Pj);
@@ -178,23 +178,6 @@ public class RocketMiner {
 
     }
 
-
-    /**
-     * <p>
-     * Returns the top-k most recent launches.
-     *
-     * @param k the number of launches to be returned.
-     * @return the list of k most recent launches.
-     */
-    public List<Launch> mostRecentLaunches(int k) {
-
-        logger.info("find most recent " + k + " launches");
-
-        Collection<Launch> launches = dao.loadAll(Launch.class);
-
-        Comparator<Launch> launchDateComparator = (a, b) -> -a.getLaunchDate().compareTo(b.getLaunchDate());
-        return launches.stream().sorted(launchDateComparator).limit(k).collect(Collectors.toList());
-    }
 
     /**
      * TODO: to be implemented & tested!
