@@ -6,16 +6,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PayloadUnitTest {
 
     private Payload payload;
+    private  String type;
+    private Set<String> identity;
+    private int weight;
+
 
     @BeforeEach
     public void setUp() {
-        payload = new Payload();
+        payload = new Payload(type,identity,weight);
     }
 
 
@@ -34,21 +40,7 @@ public class PayloadUnitTest {
         assertEquals("type cannot be null or empty", exception.getMessage());
     }
 
-    @DisplayName("should throw exception when pass null to setDescription function")
-    @Test
-    public void shouldThrowDescriptionExceptionToNull() {
 
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> payload.setDescription(null));
-        assertEquals("description cannot be null", exception.getMessage());
-    }
-
-    @DisplayName("should throw exception when pass a empty string to setDescription")
-    @ParameterizedTest
-    @ValueSource(strings = {"", " ", "  "})
-    public void shouldThrowExceptionWhenSetDescriptionoEmpty(String description) {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> payload.setDescription(description));
-        assertEquals("description cannot be null", exception.getMessage());
-    }
 
 
 }

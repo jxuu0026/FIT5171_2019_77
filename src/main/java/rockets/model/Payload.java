@@ -30,6 +30,10 @@ public class Payload {
         return weight;
     }
 
+    public void setType(String type){this.type = type;}
+
+
+
     public void setIdentity(Set<String> identity){
 
         notNull(identity);
