@@ -12,6 +12,7 @@ import rockets.dataaccess.DAO;
 import rockets.dataaccess.neo4j.Neo4jDAO;
 import rockets.model.Launch;
 import rockets.model.LaunchServiceProvider;
+import rockets.model.Payload;
 import rockets.model.Rocket;
 
 import java.util.*;
@@ -32,12 +33,18 @@ public class RocketMinerUnitTest {
     private List<Rocket> rockets;
     private List<LaunchServiceProvider> lsps;
     private List<Launch> launches;
+    private List<Payload> payloads;
 
     @BeforeEach
     public void setUp() {
         dao = mock(Neo4jDAO.class);
         miner = new RocketMiner(dao);
         rockets = Lists.newArrayList();
+        payloads = Lists.newArrayList();
+        Set set1 = new HashSet();
+        Set set2 = new HashSet();
+        set1.add("satelite"); set1.add("spacescraft"); set1.add("supervision");
+        set2.add("satelite"); set1.add("spacescraft");
 
         lsps = Arrays.asList(
                 new LaunchServiceProvider("ULA", 1990, "USA"),
@@ -48,9 +55,19 @@ public class RocketMinerUnitTest {
         // index of lsp of each rocket
         int[] lspIndex = new int[]{0, 1, 2, 1, 2};
         // 5 rockets
-        for (int i = 0; i < 5; i++) {
+        rockets.add(new Rocket("rocket_0", "Australia", lsps.get(lspIndex[0])));
+        rockets.add(new Rocket("rocket_1", "UK", lsps.get(lspIndex[1])));
+
+        for (int i = 2; i < 5; i++) {
             rockets.add(new Rocket("rocket_" + i, "USA", lsps.get(lspIndex[i])));
         }
+
+
+        payloads.add(new Payload("type_0",set1,100));
+
+        for (int i = 1; i < 10; i++){
+
+            payloads.add(new Payload("type_" + i,set2,100)); }
 
         Calendar calendar = new GregorianCalendar(2017, 01, 01);
         // month of each launch
@@ -73,6 +90,8 @@ public class RocketMinerUnitTest {
             l.setLaunchSite("VAFB");
             l.setOrbit("LEO");
             l.setPrice(i*1000.0);
+            l.setPayload(payloads.get(i));
+            l.setOrbit("aroundMoon");
 
             if(l.getLaunchServiceProvider().equals(lsps.get(0))) {
                 l.setLaunchOutcome(Launch.LaunchOutcome.SUCCESSFUL);
@@ -94,7 +113,7 @@ public class RocketMinerUnitTest {
 
     }
 
-    
+
     @Test
     public void testMostExpensiveLaunches() {
 
@@ -123,15 +142,15 @@ public class RocketMinerUnitTest {
         when(dao.loadAll(Launch.class)).thenReturn(launches);
 
         int k = 1;
-        List<LaunchServiceProvider> loadedLaunchServiceProvider = miner.highestRevenueLaunchServiceProviders(k);
+        List<LaunchServiceProvider> loadedLaunchServiceProvider = miner.highestRevenueLaunchServiceP(k);
         assertEquals(k, loadedLaunchServiceProvider.size());
-        assertEquals( lsps.get(2),  loadedLaunchServiceProvider.get(0));
+        assertEquals( lsps.get(1),  loadedLaunchServiceProvider.get(0));
 
 
         k = 2;
-        loadedLaunchServiceProvider = miner.highestRevenueLaunchServiceProviders(k);
+        loadedLaunchServiceProvider = miner.highestRevenueLaunchServiceP(k);
         assertEquals(k, loadedLaunchServiceProvider.size());
-        assertEquals( lsps.get(1),  loadedLaunchServiceProvider.get(1));
+        assertEquals( lsps.get(0),  loadedLaunchServiceProvider.get(1));
 
 
     }
@@ -162,16 +181,30 @@ public class RocketMinerUnitTest {
         when(dao.loadAll(Launch.class)).thenReturn(launches);
 
         int k = 1;
-        List<Rocket> serviveRocket = miner.mostLaunchedRockets(k);
+        List<Rocket> serviveRocket = miner.mostLaunchedRocket(k);
         assertEquals(k, serviveRocket.size());
         assertEquals( rockets.get(0),  serviveRocket.get(0));
 
         k = 2;
-        serviveRocket = miner.mostLaunchedRockets(k);
+        serviveRocket = miner.mostLaunchedRocket(k);
         assertEquals(k, serviveRocket.size());
         assertEquals(rockets.get(1), serviveRocket.get(1));
 
     }
+
+    @Test
+    public void testDominantCountry() {
+
+        when(dao.loadAll(Rocket.class)).thenReturn(rockets);
+        when(dao.loadAll(Launch.class)).thenReturn(launches);
+
+        String dominantCountry = miner.dominantCountry("aroundMoon");
+        assertEquals("Australia", dominantCountry);
+
+
+    }
+
+
     }
 
 

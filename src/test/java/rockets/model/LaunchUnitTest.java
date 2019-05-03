@@ -10,16 +10,23 @@ import java.time.LocalDate;
 import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class LaunchUnitTest {
 
     private Launch launch;
+
+    private Rocket mockRocket;
+
+    private LaunchServiceProvider mockLSP;
 
     private LaunchServiceProvider manufacturerRocket   = new LaunchServiceProvider("SpaceX", 2002, "USA");;
 
 
     @BeforeEach
     public void setUp() {
+        mockRocket = mock(Rocket.class);
+        mockLSP = mock(LaunchServiceProvider.class);
         launch = new Launch();
     }
 
@@ -164,8 +171,6 @@ public class LaunchUnitTest {
     }
 
 
-
-
     @DisplayName("should set setPrice correctly")
     @Test
     public void shouldsetSetPriceCorrectly() {
@@ -177,6 +182,25 @@ public class LaunchUnitTest {
 
 
 
+    @DisplayName("should set setLaunchVehicle and getVehicle correctly using mock Rocket class")
+    @Test
+    public void shouldsetLaunchVehicleCorrectlyMockClass() {
+
+        launch.setLaunchVehicle(mockRocket);
+
+        assertEquals(mockRocket,launch.getLaunchVehicle());
+
+    }
+
+    @DisplayName("should set setServiceProvider and getServiceProvider correctly using mock Rocket class")
+    @Test
+    public void shouldsetServiceProviderMockClass() {
+
+        launch.setLaunchServiceProvider(mockLSP);
+
+        assertEquals(mockLSP,launch.getLaunchServiceProvider());
+
+    }
 
 
 }

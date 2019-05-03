@@ -28,6 +28,9 @@ public class Launch extends Entity {
 
     private LaunchOutcome launchOutcome;
 
+    private Payload payload;
+
+
 
     public LocalDate getLaunchDate() {
         return launchDate;
@@ -42,6 +45,8 @@ public class Launch extends Entity {
     public Rocket getLaunchVehicle() {
         return launchVehicle;
     }
+
+
 
     public void setLaunchVehicle(Rocket launchVehicle) {
 
@@ -103,6 +108,19 @@ public class Launch extends Entity {
     public void setLaunchOutcome(LaunchOutcome launchOutcome) {
         this.launchOutcome = launchOutcome;
     }
+
+    public void setPayload(Payload payload) {
+
+        this.payload = payload;
+    }
+
+    public Payload getPayload() {
+
+        notNull(payload);
+
+        return payload;
+    }
+
 
     @Override
     public boolean equals(Object o) {

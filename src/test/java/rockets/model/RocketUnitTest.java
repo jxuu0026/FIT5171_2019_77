@@ -9,6 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
 
 public class RocketUnitTest {
 
@@ -18,6 +20,10 @@ public class RocketUnitTest {
 
     private String countryRocket = "" ;
 
+    private LaunchServiceProvider mockLSP;
+
+    private RocketFamily mockFamily;
+
     private LaunchServiceProvider manufacturerRocket   = new LaunchServiceProvider("SpaceX", 2002, "USA");;
 
 
@@ -26,6 +32,9 @@ public class RocketUnitTest {
 
     @BeforeEach
     public void setUp() {
+
+        mockFamily = mock(RocketFamily.class);
+        mockLSP = mock(LaunchServiceProvider.class);
         rocket = new Rocket(nameRocket, countryRocket, manufacturerRocket);
     }
 
@@ -158,4 +167,14 @@ public class RocketUnitTest {
                 '}',anotherRocket.toString());
     }
 
+
+    @DisplayName("should set setServiceProvider and getServiceProvider correctly using mock Rocket class")
+    @Test
+    public void shouldsetServiceProviderMockClass() {
+
+        rocket.setLaunchServiceProvider(mockLSP);
+
+        assertEquals(mockLSP,rocket.getManufacturer());
+
+    }
 }

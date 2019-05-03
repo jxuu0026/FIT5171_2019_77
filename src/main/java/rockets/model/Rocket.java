@@ -65,6 +65,10 @@ public class Rocket extends Entity {
         return family;
     }
 
+    public void setLaunchServiceProvider(LaunchServiceProvider manufacturer){
+        this.manufacturer = manufacturer;
+    }
+
     public void setFamily(RocketFamily family) {
         notNull(family);
         this.family = family; }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import rockets.dataaccess.DAO;
 import rockets.model.Launch;
 import rockets.model.LaunchServiceProvider;
+import rockets.model.Payload;
 import rockets.model.Rocket;
 import scala.collection.parallel.ParIterableLike;
 
@@ -32,86 +33,38 @@ public class RocketMiner {
      * @param k the number of rockets to be returned.
      * @return the list of k most active rockets.
      */
-    public List<Rocket> mostLaunchedRockets(int k) {
 
-        logger.info("find the top " + k + " active rockets!");
-
+    public List<Rocket> mostLaunchedRocket(int k) {
         Collection<Launch> launches = dao.loadAll(Launch.class);
+        HashMap<Rocket, Integer> mostLaunchRocket = new HashMap<>();
 
-        int count0 = 0;
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        int count4 = 0;
-
-        for (Launch launch : launches) {
-
-            String name = launch.getLaunchVehicle().getName();
-
-            if (launch.getLaunchVehicle().getName().equals("rocket_0")) {
-                count0 ++;
-            }
-
-            if (launch.getLaunchVehicle().getName().equals("rocket_1")) {
-                count1 = count1 + 1;
-            }
-
-            if (launch.getLaunchVehicle().getName().equals("rocket_2")) {
-                count2 = count2 + 1;
-            }
-
-            if (launch.getLaunchVehicle().getName().equals("rocket_3")) {
-                count3 = count3 + 1;
-            }
-
-            if (launch.getLaunchVehicle().getName().equals("rocket_4")) {
-                count4 = count4 + 1;
-            }
+        for(Launch launch : launches){
+            if(mostLaunchRocket.containsKey(launch.getLaunchVehicle())){
+                mostLaunchRocket.put(launch.getLaunchVehicle(), mostLaunchRocket.get(launch.getLaunchVehicle()) +1);
+            }else
+                mostLaunchRocket.put(launch.getLaunchVehicle(), 1);
 
         }
 
-        Integer Icount0 = new Integer(count0);
-        Integer Icount1 = new Integer(count1);
-        Integer Icount2 = new Integer(count2);
-        Integer Icount3 = new Integer(count3);
-        Integer Icount4 = new Integer(count4);
+        mostLaunchRocket = sortByValues(mostLaunchRocket, true);
 
-        Collection<Rocket> rockets = dao.loadAll(Rocket.class);
-        TreeMap<Integer, Rocket> frenquencyRocket = new TreeMap<>(Collections.reverseOrder());
-        for (Rocket rocket : rockets) {
-
-            if (rocket.getName().equals("rocket_0"))
-                frenquencyRocket.put(Icount0, rocket);
-
-            if (rocket.getName().equals("rocket_1"))
-                frenquencyRocket.put(Icount1, rocket);
-
-            if (rocket.getName().equals("rocket_2"))
-                frenquencyRocket.put(Icount2, rocket);
-
-            if (rocket.getName().equals("rocket_3"))
-                frenquencyRocket.put(Icount3, rocket);
-
-            if (rocket.getName().equals("rocket_4"))
-                frenquencyRocket.put(Icount4, rocket);
-        }
-
-        if(frenquencyRocket.size() > k)
-            return new ArrayList<>(frenquencyRocket.values()).subList(0, k);
+        if(mostLaunchRocket.size() > k)
+            return new ArrayList<>(mostLaunchRocket.keySet()).subList(0, k);
         else
-            return new ArrayList<>(frenquencyRocket.values());
+            return new ArrayList<>(mostLaunchRocket.keySet());
 
     }
 
-    /**
-     * TODO: to be implemented & tested!
-     * <p>
-     * Returns the top-k most reliable launch service providers as measured
-     * by percentage of successful launches.
-     *
-     * @param k the number of launch service providers to be returned.
-     * @return the list of k most reliable ones.
-     */
+
+        /**
+         * TODO: to be implemented & tested!
+         * <p>
+         * Returns the top-k most reliable launch service providers as measured
+         * by percentage of successful launches.
+         *
+         * @param k the number of launch service providers to be returned.
+         * @return the list of k most reliable ones.
+         */
     public List<LaunchServiceProvider> mostReliableLaunchServiceProviders(int k) {
 
         int i = 0; int Si = 0;  double Pi = 0;
@@ -179,6 +132,8 @@ public class RocketMiner {
     }
 
 
+
+
     /**
      * TODO: to be implemented & tested!
      * <p>
@@ -187,7 +142,21 @@ public class RocketMiner {
      * @param orbit the orbit
      * @return the country who sends the most payload to the orbit
      */
-    public String dominantCountry(String orbit) { return null;}
+    public String dominantCountry(String orbit) {
+        Collection<Launch> launches = dao.loadAll(Launch.class);
+
+        TreeMap<String, Integer > dominantCountry = new TreeMap<>();
+        for(Launch launch: launches){
+            if(dominantCountry.containsKey(launch.getLaunchVehicle().getCountry())){
+                dominantCountry.put(launch.getLaunchVehicle().getCountry(), dominantCountry.get(launch.getLaunchVehicle().getCountry())  + launch.getPayload().getIdentity().size());
+            }
+
+            else {
+                dominantCountry.put(launch.getLaunchVehicle().getCountry(),launch.getPayload().getIdentity().size());
+            }
+
+        }
+        return dominantCountry.firstKey();}
 
     /**
      * TODO: to be implemented & tested!
@@ -227,60 +196,51 @@ public class RocketMiner {
      * @return the list of k launch service providers who has the highest sales revenue.
      */
 
-    public List<LaunchServiceProvider> highestRevenueLaunchServiceProviders(int k) {
-
-        double ULAMoney = 0;
-        double SpaceXMoney = 0;
-        double ESAMoney = 0;
 
 
+    public List<LaunchServiceProvider> highestRevenueLaunchServiceP(int k) {
         Collection<Launch> launches = dao.loadAll(Launch.class);
+        HashMap<LaunchServiceProvider, Double> highestRevenueLSP = new HashMap<>();
 
-        for (Launch launch : launches){
-
-            if(launch.getLaunchServiceProvider().getName().equals("ULA"))  {
-                ULAMoney = ULAMoney + launch.getPrice();
-
+        for(Launch launch : launches){
+            if(highestRevenueLSP.containsKey(launch.getLaunchServiceProvider())){
+                highestRevenueLSP.put(launch.getLaunchServiceProvider(), highestRevenueLSP.get(launch.getLaunchServiceProvider()) + launch.getPrice());
+            } else {
+                highestRevenueLSP.put(launch.getLaunchServiceProvider(), launch.getPrice());
             }
-
-            if(launch.getLaunchServiceProvider().getName().equals("SpaceX"))  {
-                SpaceXMoney = SpaceXMoney + launch.getPrice();
-            }
-
-            if(launch.getLaunchServiceProvider().getName().equals("ESA"))  {
-                ESAMoney = ESAMoney + launch.getPrice();
-            }
-
         }
 
-        Double ULAM =new Double(ULAMoney);
-        Double SpaceM = new Double(SpaceXMoney);
-        Double ESAM = new Double(ESAMoney);
-
-        Collection<LaunchServiceProvider> serviceProvider = dao.loadAll(LaunchServiceProvider.class);
-        TreeMap<Double, LaunchServiceProvider> providerMoney = new TreeMap<>(Collections.reverseOrder());
-
-        for (LaunchServiceProvider lsp : serviceProvider) {
-
-            if (lsp.getName().equals("ULA"))
-                providerMoney.put(ULAM ,lsp);
-
-            if (lsp.getName().equals("SpaceX"))
-                providerMoney.put(SpaceM, lsp);
-
-            if (lsp.getName().equals("ESA"))
-                providerMoney.put(ESAM, lsp);
-
-        }
-
-        if(providerMoney.size() > k)
-            return new ArrayList<>(providerMoney.values()).subList(0, k);
+        if(highestRevenueLSP.size() > k)
+            return new ArrayList<>(highestRevenueLSP.keySet()).subList(0, k);
         else
-            return new ArrayList<>(providerMoney.values());
-
-
+            return new ArrayList<>(highestRevenueLSP.keySet());
     }
 
 
+    private <T> HashMap sortByValues(HashMap map, boolean isReversed) {
+
+        if(map.size() < 2)
+            return map;
+
+        List linkedList = new LinkedList(map.entrySet());
+        Comparator comparator = (Object objectOne, Object objectTwo)-> {
+            return ((Comparable) ((Map.Entry) (objectOne)).getValue())
+                    .compareTo(((Map.Entry) (objectTwo)).getValue());
+        };
+
+        if (isReversed)
+            linkedList.sort(comparator.reversed());
+        else
+            linkedList.sort(comparator);
+
+        HashMap linkedHashMap = new LinkedHashMap();
+        Map.Entry entry;
+
+        for (Object tempEntry : linkedList){
+            entry = (Map.Entry) tempEntry;
+            linkedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return linkedHashMap;
+    }
 
 }
